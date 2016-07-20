@@ -23,6 +23,14 @@ public class ClarifaiService extends IntentService {
     private static Cursor c;
     private static int flag;
     private static String compare = "ipsum";
+    private boolean mRunning;
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        mRunning = false;
+    }
 
     public ClarifaiService(){
         super(ClarifaiService.class.getName());
@@ -40,7 +48,7 @@ public class ClarifaiService extends IntentService {
         ClarifaiClient client = new ClarifaiClient(MainActivity.ClientId, MainActivity.ClientSecret);
         ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        //db.delete(ClarifaiContract.DataEntry.TABLE_NAME, null, null);
+
         ContentValues values = new ContentValues();
 
         int i;
@@ -113,6 +121,7 @@ public class ClarifaiService extends IntentService {
         }
         Log.e("Tag", "Service complete");
 
+        getApplicationContext().sendBroadcast(new Intent("mymessage"));
         }
 
     }
