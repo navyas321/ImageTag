@@ -72,38 +72,44 @@ public class ClarifaiService extends IntentService {
 
             if (flag == 0) {
                 i = 0;
-                List<RecognitionResult> results = client.recognize(new RecognitionRequest(file));
-                for (Tag tag : results.get(0).getTags()) {
-                    System.out.println(i + ": " + tag.getName() + ": " + tag.getProbability());
-                    tagName[i] = tag.getName();
-                    i++;
+                try {
+                    List<RecognitionResult> results = client.recognize(new RecognitionRequest(file));
+
+                    for (Tag tag : results.get(0).getTags()) {
+                        System.out.println(i + ": " + tag.getName() + ": " + tag.getProbability());
+                        tagName[i] = tag.getName();
+                        i++;
+                    }
+
+                    Uri uri = Uri.fromFile(file);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_IMAGE_LOCATION, uri.toString());
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG1, tagName[0]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG2, tagName[1]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG3, tagName[2]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG4, tagName[3]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG5, tagName[4]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG6, tagName[5]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG7, tagName[6]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG8, tagName[7]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG9, tagName[8]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG10, tagName[9]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG11, tagName[10]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG12, tagName[11]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG13, tagName[12]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG14, tagName[13]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG15, tagName[14]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG16, tagName[15]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG17, tagName[16]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG18, tagName[17]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG19, tagName[18]);
+                    values.put(ClarifaiContract.DataEntry.COLUMN_TAG20, tagName[19]);
+
+                    db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
                 }
-
-                Uri uri = Uri.fromFile(file);
-                values.put(ClarifaiContract.DataEntry.COLUMN_IMAGE_LOCATION, uri.toString());
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG1, tagName[0]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG2, tagName[1]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG3, tagName[2]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG4, tagName[3]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG5, tagName[4]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG6, tagName[5]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG7, tagName[6]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG8, tagName[7]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG9, tagName[8]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG10, tagName[9]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG11, tagName[10]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG12, tagName[11]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG13, tagName[12]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG14, tagName[13]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG15, tagName[14]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG16, tagName[15]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG17, tagName[16]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG18, tagName[17]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG19, tagName[18]);
-                values.put(ClarifaiContract.DataEntry.COLUMN_TAG20, tagName[19]);
-
-                db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
+                catch (Exception e){}
             }
+
+
         }
         Log.e("Tag", "Service complete");
 
