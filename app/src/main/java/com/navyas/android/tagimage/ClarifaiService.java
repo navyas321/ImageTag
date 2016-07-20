@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.clarifai.api.ClarifaiClient;
 import com.clarifai.api.RecognitionRequest;
@@ -30,7 +29,7 @@ public class ClarifaiService extends IntentService {
     }
     @Override
     protected void onHandleIntent(Intent intent) {
-        //ArrayList<String> string = (ArrayList<String>) intent.getSerializableExtra("files");
+
         List<File> files = new ArrayList<>();
         for (String attr: MainActivity.string) {
             File file = new File(attr);
@@ -41,7 +40,7 @@ public class ClarifaiService extends IntentService {
         ClarifaiClient client = new ClarifaiClient(MainActivity.ClientId, MainActivity.ClientSecret);
         ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
+        //db.delete(ClarifaiContract.DataEntry.TABLE_NAME, null, null);
         ContentValues values = new ContentValues();
 
         int i;
@@ -51,12 +50,10 @@ public class ClarifaiService extends IntentService {
                 String projection[] = {ClarifaiContract.DataEntry._ID,
                         ClarifaiContract.DataEntry.COLUMN_IMAGE_LOCATION,
                 };
-                String selection = ClarifaiContract.DataEntry.COLUMN_IMAGE_LOCATION + "=?";
-                String selectionArgs[] = {Uri.fromFile(file).toString()};
+
                 c = db.query(ClarifaiContract.DataEntry.TABLE_NAME, projection, null, null, null, null, null);
-            } catch (Exception e) {
-                Toast.makeText(this, "Works", Toast.LENGTH_LONG);
-            }
+            } catch (Exception e) {}
+
             try {
                 c.moveToFirst();
                 compare = c.getString(c.getColumnIndex(ClarifaiContract.DataEntry.COLUMN_IMAGE_LOCATION));
@@ -104,8 +101,7 @@ public class ClarifaiService extends IntentService {
                 values.put(ClarifaiContract.DataEntry.COLUMN_TAG19, tagName[18]);
                 values.put(ClarifaiContract.DataEntry.COLUMN_TAG20, tagName[19]);
 
-                long newRowId;
-                newRowId = db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
+                db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
             }
         }
 
