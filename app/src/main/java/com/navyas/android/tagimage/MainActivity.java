@@ -1,6 +1,10 @@
 package com.navyas.android.tagimage;
 
+import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -11,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -29,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     public static List<String> string = new ArrayList<String>();
     private static List<String> grid = new ArrayList<>();
     public static int stop = 0;
+    public static ProgressBar mProgress;
+    public static TextView mStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
         startService(intent);
+
+        if(isMyServiceRunning(ClarifaiService.class)) {
+            mProgress = (ProgressBar) findViewById(R.id.progress_bar);
+            mStatus = (TextView) findViewById(R.id.status);
+            mProgress.setIndeterminate(true);
+            mProgress.setProgress(0);
+        }
+
 
         Button btnSearch = (Button) findViewById(R.id.search_button);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("grid", (Serializable) grid);
 
                     startActivity(intent);
+
+
                 }
                 catch (Exception e){
                     Toast.makeText(v.getContext(), "No result found", Toast.LENGTH_LONG).show();
@@ -143,16 +161,52 @@ public class MainActivity extends AppCompatActivity {
             stop = 0;
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
             startService(intent);
+
+            mProgress.setVisibility(View.VISIBLE);
+            mStatus.setVisibility(View.VISIBLE);
+
             return true;
         }
 
         if (id == R.id.action_stop){
             stop = 1;
+            turnOffProgressBar();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void turnOffProgressBar(){
+        mProgress.setVisibility(View.INVISIBLE);
+        mStatus.setVisibility(View.INVISIBLE);
+    }
+
+    private BroadcastReceiver onBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context ctxt, Intent i) {
+            turnOffProgressBar();
+        }
+    };
+
+    protected void onResume(){
+        super.onResume();
+        registerReceiver(onBroadcast, new IntentFilter("mymessage"));
+    }
+
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(onBroadcast);
+    }
 
 
 }
