@@ -23,44 +23,37 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private static int columnIndex;
     private static final String[] proj = {MediaStore.Images.Media.DATA};
-    public static final String ClientId = "-0tf0EPVrK7qaqFM5mGSr5x6RGfxTfYj2HuBRQ3O";
-    public static final String ClientSecret = "s7ZGulJ7JNJZaBsNkZtWmk0Rrhi4W7xAyiGCiQjO";
+    public static final String ClientId = "id";
+    public static final String ClientSecret = "secret";
     private static String[] tagName = new String[20];
     public static List<String> string = new ArrayList<String>();
     private static List<String> grid = new ArrayList<>();
+    public static int stop = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnSync = (Button) findViewById(R.id.sync_button);
+        List<File> files = new ArrayList<>();
 
-        btnSync.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-
-                List<File> files = new ArrayList<>();
-
-                cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-                columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                string.add(cursor.getString(columnIndex));
+        cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
+        columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        string.add(cursor.getString(columnIndex));
 
 
-                while (cursor.moveToNext()){
-                    string.add(cursor.getString(columnIndex));
-                }
+        while (cursor.moveToNext()){
+            string.add(cursor.getString(columnIndex));
+        }
 
-                for (String attr: string) {
-                    File file = new File(attr);
-                    files.add(file);
-                }
+        for (String attr: string) {
+            File file = new File(attr);
+            files.add(file);
+        }
 
-                Intent intent = new Intent(Intent.ACTION_SYNC, null, v.getContext(), ClarifaiService.class);
-                startService(intent);
-            }
-        });
+        Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
+        startService(intent);
 
         Button btnSearch = (Button) findViewById(R.id.search_button);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -139,8 +132,22 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_delete) {
+            ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+            db.delete(ClarifaiContract.DataEntry.TABLE_NAME, null, null);
             return true;
+        }
+
+        if (id == R.id.action_resync){
+            stop = 0;
+            Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
+            startService(intent);
+            return true;
+        }
+
+        if (id == R.id.action_stop){
+            stop = 1;
         }
 
         return super.onOptionsItemSelected(item);

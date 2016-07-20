@@ -45,6 +45,7 @@ public class ClarifaiService extends IntentService {
 
         int i;
         for (File file: files) {
+            if(MainActivity.stop == 1) break;
             flag = 0;
             try {
                 String projection[] = {ClarifaiContract.DataEntry._ID,
@@ -104,6 +105,7 @@ public class ClarifaiService extends IntentService {
                 db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
             }
         }
+        Log.e("Tag", "Service complete");
 
         }
 
