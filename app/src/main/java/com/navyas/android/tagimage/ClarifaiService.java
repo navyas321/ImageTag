@@ -2,9 +2,12 @@ package com.navyas.android.tagimage;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
@@ -72,8 +75,6 @@ public class ClarifaiService extends IntentService {
                     compare = c.getString(c.getColumnIndex(ClarifaiContract.DataEntry.COLUMN_IMAGE_LOCATION));
                     if (compare.equals(Uri.fromFile(file).toString()))
                         flag = 1;
-                    Log.e("TAG", "Running");
-
                 }
             }
             catch (Exception e){}
@@ -114,7 +115,10 @@ public class ClarifaiService extends IntentService {
 
                     db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
                 }
-                catch (Exception e){}
+                catch (Exception e){if(!isNetworkAvailable()){
+                    getApplicationContext().sendBroadcast(new Intent("mymessage"));
+                    return;
+                }}
             }
 
 
@@ -124,5 +128,13 @@ public class ClarifaiService extends IntentService {
         getApplicationContext().sendBroadcast(new Intent("mymessage"));
         }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+
+}
 

@@ -1,14 +1,20 @@
 package com.navyas.android.tagimage;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,37 +39,39 @@ public class MainActivity extends AppCompatActivity {
     public static final String ClientSecret = "secret";
     private static String[] tagName = new String[20];
     public static List<String> string = new ArrayList<String>();
+    private static List<File> files = new ArrayList<>();
     private static List<String> grid = new ArrayList<>();
     public static int stop = 0;
     public static ProgressBar mProgress;
     public static TextView mStatus;
+    private static final int REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        List<File> files = new ArrayList<>();
-
-        cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-        columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        string.add(cursor.getString(columnIndex));
 
 
-        while (cursor.moveToNext()){
-            string.add(cursor.getString(columnIndex));
-        }
 
-        for (String attr: string) {
-            File file = new File(attr);
-            files.add(file);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+           getData();
+
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Toast.makeText(this, "External Storage Permission Required", Toast.LENGTH_SHORT).show();
+            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
+
         }
 
         Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
         startService(intent);
 
-        if(isMyServiceRunning(ClarifaiService.class)) {
+
+        if (isMyServiceRunning(ClarifaiService.class)) {
             mProgress = (ProgressBar) findViewById(R.id.progress_bar);
             mStatus = (TextView) findViewById(R.id.status);
             mProgress.setIndeterminate(true);
@@ -125,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
 
 
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Toast.makeText(v.getContext(), "No result found", Toast.LENGTH_LONG).show();
                 }
             }
@@ -135,21 +142,51 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void getData() {
+        string.clear();
+        cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
+        columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        string.add(cursor.getString(columnIndex));
+        while (cursor.moveToNext()) {
+            string.add(cursor.getString(columnIndex));
+        }
+
+        for (String attr : string) {
+            File file = new File(attr);
+            files.add(file);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getData();
+                Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
+                startService(intent);
+            } else {
+                Toast.makeText(this, "External read permission has not been granted, cannot read images", Toast.LENGTH_SHORT).show();
+                turnOffProgressBar();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_delete) {
             ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -157,8 +194,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.action_resync){
+        if (id == R.id.action_resync) {
             stop = 0;
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED)
+                Toast.makeText(this, "External read permission has not been granted, cannot read images", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(Intent.ACTION_SYNC, null, this, ClarifaiService.class);
             startService(intent);
 
@@ -168,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.action_stop){
+        if (id == R.id.action_stop) {
             stop = 1;
             turnOffProgressBar();
         }
@@ -186,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public static void turnOffProgressBar(){
+    public static void turnOffProgressBar() {
         mProgress.setVisibility(View.INVISIBLE);
         mStatus.setVisibility(View.INVISIBLE);
     }
@@ -195,17 +236,25 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context ctxt, Intent i) {
             turnOffProgressBar();
+            if(!isNetworkAvailable()) Toast.makeText(ctxt, "No internet", Toast.LENGTH_SHORT).show();
         }
     };
 
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         registerReceiver(onBroadcast, new IntentFilter("mymessage"));
     }
 
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         unregisterReceiver(onBroadcast);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 
