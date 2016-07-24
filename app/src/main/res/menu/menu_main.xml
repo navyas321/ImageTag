@@ -2,20 +2,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.navyas.android.tagimage.MainActivity">
+
     <item
         android:id="@+id/action_delete"
         android:orderInCategory="3"
         android:title="@string/action_delete"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:background="#E8EAF6"
+        />
     <item
         android:id="@+id/action_resync"
         android:orderInCategory="1"
         android:title="@string/action_resync"
-        android:icon="@drawable/cloud_sync"
+        android:icon="@drawable/sync_icon2"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_stop"
         android:orderInCategory="2"
         android:title="@string/action_stop"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:background="#E8EAF6"/>
 </menu>

@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label=""
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
@@ -23,7 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GridViewActivity"></activity>
+        <activity android:name=".GridViewActivity"
+            android:label="Results"
+            android:parentActivityName=".MainActivity"
+            >
+        </activity>
         <service
             android:name=".ClarifaiService"
             android:exported="false" />

@@ -1,8 +1,18 @@
 <resources>
-    <string name="app_name">ImageTag</string>
+    <string name="app_name">Image Tag</string>
+
+
     <string name="action_settings">Settings</string>
     <string name="action_delete">Clear Data</string>
     <string name="action_resync">Resync</string>
     <string name="action_stop">Stop Sync</string>
-    <string name="status">Syncing Photos</string>
+    <string name="status">Syncing...</string>
+
+
+    <string name="action_search">Search</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="search">Search</string>
+
+
 </resources>

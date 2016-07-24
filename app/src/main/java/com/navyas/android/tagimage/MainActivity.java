@@ -18,9 +18,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private static int columnIndex;
     private static final String[] proj = {MediaStore.Images.Media.DATA};
-    public static final String ClientId = "id";
-    public static final String ClientSecret = "secret";
+    public static final String ClientId = "-0tf0EPVrK7qaqFM5mGSr5x6RGfxTfYj2HuBRQ3O";
+    public static final String ClientSecret = "s7ZGulJ7JNJZaBsNkZtWmk0Rrhi4W7xAyiGCiQjO";
     private static String[] tagName = new String[20];
     public static List<String> string = new ArrayList<String>();
     private static List<File> files = new ArrayList<>();
@@ -51,8 +53,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
+        android.support.v7.app.ActionBar menu = getSupportActionBar();
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.mipmap.ic_launcher);
+        menu.setDisplayUseLogoEnabled(true);
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Button btnSearch = (Button) findViewById(R.id.search_button);
+        ImageButton btnSearch = (ImageButton) findViewById(R.id.search_button);
         btnSearch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
@@ -143,19 +147,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getData() {
-        string.clear();
-        cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-        columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        string.add(cursor.getString(columnIndex));
-        while (cursor.moveToNext()) {
+        try {
+            string.clear();
+            cursor = managedQuery(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, proj, null, null, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
+            columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
             string.add(cursor.getString(columnIndex));
+            while (cursor.moveToNext()) {
+                string.add(cursor.getString(columnIndex));
+            }
+
+            for (String attr : string) {
+                File file = new File(attr);
+                files.add(file);
+            }
+        }
+        catch (Exception e){
+            Toast.makeText(this, "No images found", Toast.LENGTH_LONG).show();
         }
 
-        for (String attr : string) {
-            File file = new File(attr);
-            files.add(file);
-        }
     }
 
 
@@ -255,6 +265,14 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.
+                INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        return true;
     }
 
 

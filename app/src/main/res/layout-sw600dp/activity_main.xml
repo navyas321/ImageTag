@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:paddingBottom="200dp"
+        android:paddingBottom="350dp"
         android:background="#E8EAF6"
         android:weightSum="1">
 
@@ -45,7 +45,7 @@
 
 
     <EditText
-        android:layout_width="299dp"
+        android:layout_width="700dp"
         android:layout_height="wrap_content"
         android:id="@+id/edit_query"
         android:hint="  Search"
