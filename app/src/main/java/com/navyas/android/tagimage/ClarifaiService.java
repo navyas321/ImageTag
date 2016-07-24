@@ -45,7 +45,7 @@ public class ClarifaiService extends IntentService {
         for (String attr: MainActivity.string) {
             File file = new File(attr);
             files.add(file);
-            Log.e("Tag", attr);
+            //For Debugging Log.e("Tag", attr);
         }
 
         ClarifaiClient client = new ClarifaiClient(MainActivity.ClientId, MainActivity.ClientSecret);
@@ -85,7 +85,7 @@ public class ClarifaiService extends IntentService {
                     List<RecognitionResult> results = client.recognize(new RecognitionRequest(file));
 
                     for (Tag tag : results.get(0).getTags()) {
-                        System.out.println(i + ": " + tag.getName() + ": " + tag.getProbability());
+                        // For Debugging System.out.println(i + ": " + tag.getName() + ": " + tag.getProbability());
                         tagName[i] = tag.getName();
                         i++;
                     }

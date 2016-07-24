@@ -37,9 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private static int columnIndex;
     private static final String[] proj = {MediaStore.Images.Media.DATA};
-    public static final String ClientId = "-0tf0EPVrK7qaqFM5mGSr5x6RGfxTfYj2HuBRQ3O";
-    public static final String ClientSecret = "s7ZGulJ7JNJZaBsNkZtWmk0Rrhi4W7xAyiGCiQjO";
-    private static String[] tagName = new String[20];
+    public static final String ClientId = "id";
+    public static final String ClientSecret = "secret";
     public static List<String> string = new ArrayList<String>();
     private static List<File> files = new ArrayList<>();
     private static List<String> grid = new ArrayList<>();
@@ -57,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         menu.setDisplayShowHomeEnabled(true);
         menu.setLogo(R.mipmap.ic_launcher);
         menu.setDisplayUseLogoEnabled(true);
+        menu.setTitle("");
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -197,12 +197,13 @@ public class MainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.action_delete) {
+        //For Debugging
+       /* if (id == R.id.action_delete) {
             ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             db.delete(ClarifaiContract.DataEntry.TABLE_NAME, null, null);
             return true;
-        }
+        }*/
 
         if (id == R.id.action_resync) {
             stop = 0;

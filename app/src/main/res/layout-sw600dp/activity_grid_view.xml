@@ -9,6 +9,4 @@
     android:stretchMode="columnWidth"
     android:gravity="center"
     android:numColumns="4"
-
-
-          android:background="#E8EAF6"/>
+    android:background="#E8EAF6"/>
