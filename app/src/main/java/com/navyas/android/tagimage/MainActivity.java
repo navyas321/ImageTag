@@ -41,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private static int columnIndex;
     private static final String[] proj = {MediaStore.Images.Media.DATA};
-    public static final String ClientId = "id";
-    public static final String ClientSecret = "secret";
+    //Keys
     public static List<String> string = new ArrayList<String>();
     private static List<File> files = new ArrayList<>();
     private static List<String> grid = new ArrayList<>();
@@ -217,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //For Debugging
-       /* if (id == R.id.action_delete) {
+        /*if (id == R.id.action_delete) {
             ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             db.delete(ClarifaiContract.DataEntry.TABLE_NAME, null, null);

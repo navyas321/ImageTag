@@ -50,6 +50,7 @@
             android:id="@+id/edit_query"
             android:hint="@string/search"
             android:singleLine="true"
+            android:inputType="textCapWords"
             />
 
         <android.support.design.widget.TextInputLayout

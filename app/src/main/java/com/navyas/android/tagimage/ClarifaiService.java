@@ -27,6 +27,7 @@ public class ClarifaiService extends IntentService {
     private static int flag;
     private static String compare = "ipsum";
     private boolean mRunning;
+    public static int iterator = 0;
 
     @Override
     public void onCreate()
@@ -48,7 +49,8 @@ public class ClarifaiService extends IntentService {
             //For Debugging Log.e("Tag", attr);
         }
 
-        ClarifaiClient client = new ClarifaiClient(MainActivity.ClientId, MainActivity.ClientSecret);
+        ClarifaiClient client = new ClarifaiClient(MainActivity.ClientId[iterator], MainActivity.ClientSecret[iterator]);
+        client.setMaxAttempts(1);
         ClarifaiDbHelper mDbHelper = new ClarifaiDbHelper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -83,7 +85,7 @@ public class ClarifaiService extends IntentService {
                 i = 0;
                 try {
                     List<RecognitionResult> results = client.recognize(new RecognitionRequest(file));
-
+                    if(results == null) Log.e("ERROR","ERROR");
                     for (Tag tag : results.get(0).getTags()) {
                         // For Debugging System.out.println(i + ": " + tag.getName() + ": " + tag.getProbability());
                         tagName[i] = tag.getName();
@@ -115,15 +117,22 @@ public class ClarifaiService extends IntentService {
 
                     db.insert(ClarifaiContract.DataEntry.TABLE_NAME, null, values);
                 }
-                catch (Exception e){if(!isNetworkAvailable()){
+                catch (Exception e)
+                {
+                    if(!isNetworkAvailable()){
                     getApplicationContext().sendBroadcast(new Intent("mymessage"));
                     return;
-                }}
+                    }
+                    iterator++;
+                    client = new ClarifaiClient(MainActivity.ClientId[iterator], MainActivity.ClientSecret[iterator]);
+                    client.setMaxAttempts(1);
+                    continue;
+                }
             }
 
 
         }
-        Log.e("Tag", "Service complete");
+        //For Debugging Log.e("Tag", "Service complete");
 
         getApplicationContext().sendBroadcast(new Intent("mymessage"));
         }
