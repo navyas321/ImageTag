@@ -85,7 +85,6 @@ public class ClarifaiService extends IntentService {
                 i = 0;
                 try {
                     List<RecognitionResult> results = client.recognize(new RecognitionRequest(file));
-                    if(results == null) Log.e("ERROR","ERROR");
                     for (Tag tag : results.get(0).getTags()) {
                         // For Debugging System.out.println(i + ": " + tag.getName() + ": " + tag.getProbability());
                         tagName[i] = tag.getName();
