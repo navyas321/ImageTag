@@ -41,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
     private Cursor cursor;
     private static int columnIndex;
     private static final String[] proj = {MediaStore.Images.Media.DATA};
-    //Keys
+    public static String[] ClientId = {"-0tf0EPVrK7qaqFM5mGSr5x6RGfxTfYj2HuBRQ3O", "QwyVMelyYYyB57bUcmAj5pNJ8DFbF2vX_otHSwP1",
+            "fKV494OfFhWTmYJZJUZH04JfjF8Z__bpUTFF7ArX"};
+    public static String[] ClientSecret = {"s7ZGulJ7JNJZaBsNkZtWmk0Rrhi4W7xAyiGCiQjO", "uTvXRCBEaenYGwAbae56BIcxavMduS6TtJHMnYCZ",
+            "vbg4O-95TI4xOvL7TPGg3BgSXSRQGrGWNvdcoKZc"};
     public static List<String> string = new ArrayList<String>();
     private static List<File> files = new ArrayList<>();
     private static List<String> grid = new ArrayList<>();
