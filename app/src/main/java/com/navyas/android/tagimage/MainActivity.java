@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         menu.setDisplayShowHomeEnabled(true);
-        menu.setLogo(R.mipmap.ic_launcher);
+            menu.setLogo(R.mipmap.ic_launcher);
         menu.setDisplayUseLogoEnabled(true);
 
         if (ContextCompat.checkSelfPermission(this,
